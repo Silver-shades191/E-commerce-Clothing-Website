@@ -1,69 +1,94 @@
-import Image from "next/image";
+import Link from "next/link";
+import { ProductCard } from "@/components/product-card";
+import { getCategories, getFeaturedProducts } from "@/lib/catalog";
+import { ProductImage } from "@/components/product-image";
 
-export default function Home() {
+// Stock and featured items change often, so render per request.
+export const dynamic = "force-dynamic";
+
+export default async function HomePage() {
+  const [categories, featured] = await Promise.all([getCategories(), getFeaturedProducts(4)]);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <>
+      <section className="relative isolate overflow-hidden border-b border-line">
+        <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_70%_20%,_rgb(201_169_110/0.14),_transparent_70%)]" />
+        <div className="container-page grid min-h-[78vh] items-center gap-12 py-24 lg:grid-cols-12">
+          <div className="fade-up lg:col-span-7">
+            <p className="eyebrow">Autumn / Winter 2026</p>
+            <h1 className="mt-6 text-5xl leading-[1.05] sm:text-6xl lg:text-7xl">
+              Cut for the <em className="text-gold not-italic">considered</em> wardrobe.
+            </h1>
+            <p className="mt-8 max-w-xl text-base leading-relaxed text-muted sm:text-lg">
+              Long-staple cotton, precise tailoring and finishes you notice on the second wear. Shirts and tees built to last
+              years, not seasons.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link href="/shop" className="btn btn-primary">Shop the collection</Link>
+              <Link href="/category/t-shirts" className="btn btn-outline">Explore tees</Link>
+            </div>
+          </div>
+          <div className="fade-up relative aspect-[4/5] overflow-hidden rounded-[var(--radius-card)] border border-line lg:col-span-5" style={{ animationDelay: "120ms" }}>
+            <ProductImage alt="Featured collection" priority />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      <section aria-labelledby="categories" className="container-page py-24">
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <p className="eyebrow">Shop by category</p>
+            <h2 id="categories" className="mt-3 text-3xl sm:text-4xl">Find your fit</h2>
+          </div>
         </div>
-      </main>
-    </div>
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
+          {categories.map((c) => (
+            <Link
+              key={c.id}
+              href={`/category/${c.slug}`}
+              className="card group relative flex min-h-56 flex-col justify-end overflow-hidden p-7 transition duration-500 hover:-translate-y-1 hover:border-gold/60"
+            >
+              <span className="eyebrow">Collection</span>
+              <h3 className="mt-2 text-2xl">{c.name}</h3>
+              <p className="mt-2 text-sm text-muted">{c.description}</p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {featured.length > 0 && (
+        <section aria-labelledby="featured" className="container-page pb-24">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <div>
+              <p className="eyebrow">Editor&rsquo;s picks</p>
+              <h2 id="featured" className="mt-3 text-3xl sm:text-4xl">Featured this season</h2>
+            </div>
+            <Link href="/shop" className="text-sm text-muted underline-offset-4 hover:text-bone hover:underline">
+              View all
+            </Link>
+          </div>
+          <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-12 lg:grid-cols-4">
+            {featured.map((p, i) => (
+              <ProductCard key={p.id} product={p} priority={i < 2} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section className="border-y border-line bg-surface">
+        <div className="container-page grid gap-10 py-16 sm:grid-cols-3">
+          {[
+            ["Fabric", "Long-staple cotton and Italian poplin, sourced for weight and drape."],
+            ["Fit", "Patterns drafted in three body blocks, with tested sizing charts on every product."],
+            ["Returns", "Thirty days to return unworn items. Refunds go back to your original payment method."],
+          ].map(([title, text]) => (
+            <div key={title}>
+              <h3 className="text-xl">{title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-muted">{text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </>
   );
 }

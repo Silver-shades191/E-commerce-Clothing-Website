@@ -1,26 +1,197 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+  Design tokens. One source of truth for colour, type, radius, elevation and motion.
+  Dark-first. Light tokens are defined below for users who prefer a light scheme.
+*/
+@theme {
+  --color-ink: #0f0e0c;
+  --color-surface: #17150f;
+  --color-raised: #201d17;
+  --color-line: #2e2a23;
+  --color-bone: #f4efe6;
+  --color-muted: #a39c8f;
+  --color-gold: #c9a96e;
+  --color-gold-strong: #e2c28c;
+  --color-danger: #e08a7c;
+  --color-success: #9cc597;
+
+  --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  --radius-card: 16px;
+  --radius-control: 999px;
+  --shadow-lift: 0 24px 60px -24px rgb(0 0 0 / 0.7);
+  --shadow-soft: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 8px 24px -12px rgb(0 0 0 / 0.6);
+
+  --ease-lux: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --container-page: 80rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--color-ink);
+    color: var(--color-bone);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    min-height: 100dvh;
+    background: var(--color-ink);
+  }
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-gold);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: var(--color-gold);
+    color: var(--color-ink);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .container-page {
+    width: min(100% - 2.5rem, var(--container-page));
+    margin-inline: auto;
+  }
+  .eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: var(--radius-control);
+    padding: 0.8rem 1.5rem;
+    font-size: 0.85rem;
+    letter-spacing: 0.04em;
+    font-weight: 500;
+    transition: background-color 200ms var(--ease-lux), color 200ms var(--ease-lux), border-color 200ms var(--ease-lux), transform 200ms var(--ease-lux);
+    cursor: pointer;
+    min-height: 44px;
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .btn-primary {
+    background: var(--color-gold);
+    color: var(--color-ink);
+  }
+  .btn-primary:hover:not(:disabled) {
+    background: var(--color-gold-strong);
+  }
+  .btn-outline {
+    border: 1px solid var(--color-line);
+    color: var(--color-bone);
+  }
+  .btn-outline:hover:not(:disabled) {
+    border-color: var(--color-gold);
+    color: var(--color-gold-strong);
+  }
+  .btn-danger {
+    border: 1px solid color-mix(in oklab, var(--color-danger) 50%, transparent);
+    color: var(--color-danger);
+  }
+  .field-label {
+    display: block;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    margin-bottom: 0.4rem;
+  }
+  .input {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    padding: 0.8rem 1rem;
+    color: var(--color-bone);
+    font-size: 0.95rem;
+    min-height: 44px;
+    transition: border-color 200ms var(--ease-lux), box-shadow 200ms var(--ease-lux);
+  }
+  .input::placeholder {
+    color: color-mix(in oklab, var(--color-muted) 70%, transparent);
+  }
+  .input:focus {
+    outline: none;
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-gold) 22%, transparent);
+  }
+  .input[aria-invalid="true"] {
+    border-color: var(--color-danger);
+  }
+  .card {
+    border-radius: var(--radius-card);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-soft);
+  }
+  .chip {
+    border-radius: var(--radius-control);
+    border: 1px solid var(--color-line);
+    padding: 0.4rem 0.9rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+    transition: all 200ms var(--ease-lux);
+  }
+  .chip[aria-pressed="true"],
+  .chip[data-active="true"] {
+    border-color: var(--color-gold);
+    color: var(--color-gold-strong);
+    background: color-mix(in oklab, var(--color-gold) 10%, transparent);
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-raised) 50%, var(--color-surface) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer {
+    to { background-position: -200% 0; }
+  }
+  .fade-up {
+    animation: fade-up 600ms var(--ease-lux) both;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: none; }
+  }
+}
+
+/* Light scheme, applied only when a user explicitly chooses it. */
+:root[data-theme="light"] {
+  --color-ink: #faf7f2;
+  --color-surface: #ffffff;
+  --color-raised: #f3eee5;
+  --color-line: #e4ddd0;
+  --color-bone: #1b1915;
+  --color-muted: #6f685c;
+  --color-gold: #9a7638;
+  --color-gold-strong: #7d5d24;
 }
